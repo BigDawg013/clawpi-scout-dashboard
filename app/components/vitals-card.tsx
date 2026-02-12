@@ -24,7 +24,7 @@ export function VitalsCard({ system }: VitalsCardProps) {
     return (
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
-          Pi Vitals
+          System Vitals
         </div>
         <p className="text-sm text-muted">Waiting for data...</p>
       </div>
@@ -38,19 +38,21 @@ export function VitalsCard({ system }: VitalsCardProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
-        Pi Vitals
+        System Vitals
       </div>
 
       <div className="space-y-3">
-        <div>
-          <div className="mb-1.5 flex items-center justify-between text-sm">
-            <span className="text-secondary">CPU Temp</span>
-            <span className="font-medium" style={{ color: tempColor }}>
-              {formatTemp(system.cpu_temp)}
-            </span>
+        {system.cpu_temp > 0 && (
+          <div>
+            <div className="mb-1.5 flex items-center justify-between text-sm">
+              <span className="text-secondary">CPU Temp</span>
+              <span className="font-medium" style={{ color: tempColor }}>
+                {formatTemp(system.cpu_temp)}
+              </span>
+            </div>
+            <ProgressBar value={system.cpu_temp} max={85} color={tempColor} />
           </div>
-          <ProgressBar value={system.cpu_temp} max={85} color={tempColor} />
-        </div>
+        )}
 
         <div>
           <div className="mb-1.5 flex items-center justify-between text-sm">
