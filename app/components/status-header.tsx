@@ -17,41 +17,32 @@ export function StatusHeader({ machines, latestTs, isLoading, monitoringSince }:
   const dotColor = isLoading ? "#fbbf24" : isStale ? "#f87171" : "#34d399";
 
   return (
-    <header className="relative">
-      {/* Subtle gradient wash behind header */}
-      <div className="pointer-events-none absolute -inset-x-4 -top-8 h-40 bg-gradient-to-b from-white/[0.015] to-transparent" />
-
-      <div className="relative flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">ClawPi Scout</h1>
-            <p className="mt-0.5 text-xs text-muted">System Monitoring Dashboard</p>
-          </div>
+    <header>
+      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-lg font-semibold tracking-tight sm:text-xl">ClawPi Scout</h1>
           <span
             className={`status-dot ${!isLoading && !isStale ? "status-dot-pulse" : ""}`}
             style={{ backgroundColor: dotColor, color: dotColor }}
           />
-        </div>
-        <div className="flex items-center gap-3 text-xs text-muted">
-          {latestTs > 0 && (
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block h-1 w-1 rounded-full bg-up/60" />
-              <span className="font-mono">Updated {formatRelativeTime(latestTs)}</span>
-            </span>
-          )}
-          {monitoringSince && (
-            <span className="hidden sm:inline">
-              Since {new Date(monitoringSince).toLocaleDateString()}
-            </span>
-          )}
-          <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium tracking-wider text-muted">
+          <span className="rounded bg-white/[0.05] px-1.5 py-px text-[10px] font-medium tracking-wider text-muted">
             LIVE
           </span>
+        </div>
+        <div className="flex items-center gap-2.5 text-[11px] text-muted">
+          {latestTs > 0 && (
+            <span className="font-mono">Updated {formatRelativeTime(latestTs)}</span>
+          )}
+          {monitoringSince && (
+            <span className="hidden sm:inline text-muted/60">
+              &middot; Since {new Date(monitoringSince).toLocaleDateString()}
+            </span>
+          )}
         </div>
       </div>
 
       {/* Machine status badges */}
-      <div className="mt-5 flex flex-wrap gap-2.5">
+      <div className="mt-3 flex flex-wrap gap-1.5">
         {(Object.keys(MACHINE_META) as MachineId[]).map((id) => {
           const meta = MACHINE_META[id];
           const data = machines[id];
@@ -64,14 +55,14 @@ export function StatusHeader({ machines, latestTs, isLoading, monitoringSince }:
             <a
               key={id}
               href={`#${id}`}
-              className="badge-hover group flex items-center gap-2.5 rounded-xl border border-border/50 bg-white/[0.02] px-3.5 py-2.5 text-sm backdrop-blur-sm transition-all hover:border-border hover:bg-white/[0.04]"
+              className="badge-hover group flex items-center gap-1.5 rounded-lg border border-border/40 bg-white/[0.02] px-2.5 py-1.5 text-xs backdrop-blur-sm transition-all hover:border-border hover:bg-white/[0.04]"
             >
               <span
                 className="status-dot"
                 style={{ backgroundColor: badgeDotColor, color: badgeDotColor }}
               />
               <span className="font-medium text-foreground">{meta.label}</span>
-              <span className="text-xs text-muted transition-colors group-hover:text-secondary">
+              <span className="hidden text-[11px] text-muted transition-colors group-hover:text-secondary sm:inline">
                 {meta.description}
               </span>
             </a>
