@@ -10,15 +10,17 @@ interface AlertsListProps {
 
 export function AlertsList({ alerts }: AlertsListProps) {
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
-      <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
+    <div className="card-base card-glow-top rounded-2xl p-5">
+      <div className="mb-4 text-[11px] font-medium uppercase tracking-wider text-muted">
         Recent Alerts
       </div>
 
       {alerts.length === 0 ? (
-        <p className="text-sm text-muted">No alerts yet</p>
+        <div className="flex h-24 items-center justify-center text-sm text-muted/60">
+          No alerts recorded
+        </div>
       ) : (
-        <div className="max-h-60 space-y-2 overflow-y-auto">
+        <div className="scrollbar-thin max-h-60 space-y-1 overflow-y-auto">
           {alerts.map((alert, i) => {
             const isRecovery = alert.message.toLowerCase().includes("recover");
             const machineLabel = alert.machine
@@ -27,23 +29,22 @@ export function AlertsList({ alerts }: AlertsListProps) {
             return (
               <div
                 key={`${alert.ts}-${i}`}
-                className="flex items-start gap-3 rounded-lg bg-zinc-900/50 px-3 py-2 text-sm"
+                className="group flex items-start gap-3 rounded-xl px-3.5 py-3 text-sm transition-colors hover:bg-white/[0.03]"
               >
-                <span
-                  className={`mt-0.5 inline-block h-2 w-2 shrink-0 rounded-full ${
-                    isRecovery ? "bg-green-500" : "bg-red-500"
-                  }`}
+                <div
+                  className="mt-1 h-4 w-0.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: isRecovery ? "#34d399" : "#f87171" }}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="break-words text-foreground">{alert.message}</p>
-                  <p className="mt-0.5 text-xs text-muted">
+                  <p className="break-words text-foreground/90">{alert.message}</p>
+                  <div className="mt-1.5 flex items-center gap-2 text-xs text-muted">
                     {machineLabel && (
-                      <span className="mr-2 rounded bg-zinc-800 px-1.5 py-0.5">
+                      <span className="rounded-md bg-white/[0.04] px-1.5 py-0.5 font-medium">
                         {machineLabel}
                       </span>
                     )}
-                    {formatRelativeTime(alert.ts)}
-                  </p>
+                    <span className="font-mono">{formatRelativeTime(alert.ts)}</span>
+                  </div>
                 </div>
               </div>
             );

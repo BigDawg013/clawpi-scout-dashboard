@@ -1,8 +1,9 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { MACHINE_META } from "@/lib/types";
 import type { MachineId, MachineData } from "@/lib/types";
-import { formatRelativeTime, formatUptime, formatTemp, formatMemory } from "@/lib/utils";
+import { formatRelativeTime } from "@/lib/utils";
 import { GatewayCard } from "./gateway-card";
 import { VitalsCard } from "./vitals-card";
 import { SensorCard } from "./sensor-card";
@@ -12,52 +13,67 @@ interface MachineSectionProps {
   data: MachineData | null;
 }
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+};
+
 export function MachineSection({ machineId, data }: MachineSectionProps) {
   const meta = MACHINE_META[machineId];
   const current = data?.current;
   const online = current && (Date.now() / 1000 - current.ts) < 300;
 
+  const dotColor = !current ? "#3f3f46" : online ? "#34d399" : "#f87171";
+
   return (
     <section id={machineId}>
-      <div className="mb-3 flex items-center gap-3">
+      <div className="mb-4 flex items-center gap-3">
         <span
-          className={`inline-block h-2.5 w-2.5 rounded-full ${
-            !current ? "bg-zinc-600" : online ? "bg-green-500" : "bg-red-500"
-          }`}
+          className={`status-dot ${online ? "status-dot-pulse" : ""}`}
+          style={{ backgroundColor: dotColor, color: dotColor }}
         />
-        <h2 className="text-sm font-bold uppercase tracking-widest text-secondary">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-secondary">
           {meta.label}
         </h2>
         <span className="text-xs text-muted">{meta.description}</span>
         {current && (
-          <span className="ml-auto text-xs text-muted">
+          <span className="ml-auto text-xs font-mono text-muted">
             {formatRelativeTime(current.ts)}
           </span>
         )}
       </div>
 
       {!current ? (
-        <div className="rounded-xl border border-border bg-card p-5">
+        <div className="card-base card-glow-top rounded-2xl p-5">
           <p className="text-sm text-muted">Waiting for data from {meta.label}...</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {/* Gateway card only for clawpiscout */}
+        <motion.div
+          className="grid gap-5 sm:grid-cols-2"
+          initial="hidden"
+          animate="visible"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+        >
           {current.gateway && (
-            <GatewayCard
-              gateway={current.gateway}
-              dashboard={current.dashboard ?? null}
-            />
+            <motion.div variants={cardVariants}>
+              <GatewayCard
+                gateway={current.gateway}
+                dashboard={current.dashboard ?? null}
+              />
+            </motion.div>
           )}
-          <VitalsCard system={current.system} />
-          {/* Sensor card only if sensor data exists */}
+          <motion.div variants={cardVariants}>
+            <VitalsCard system={current.system} />
+          </motion.div>
           {current.sensor && (current.sensor.temperature !== null || current.sensor.humidity !== null) && (
-            <SensorCard
-              sensor={current.sensor}
-              dashboard={current.dashboard ?? null}
-            />
+            <motion.div variants={cardVariants}>
+              <SensorCard
+                sensor={current.sensor}
+                dashboard={current.dashboard ?? null}
+              />
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       )}
     </section>
   );

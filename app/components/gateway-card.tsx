@@ -8,24 +8,43 @@ interface GatewayCardProps {
   dashboard: DashboardState | null;
 }
 
+function ProgressBar({ value, max, color, gradientTo }: { value: number; max: number; color: string; gradientTo?: string }) {
+  const pct = Math.min((value / max) * 100, 100);
+  return (
+    <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
+      <div
+        className="h-full rounded-full transition-all duration-700 ease-out"
+        style={{
+          width: `${pct}%`,
+          background: gradientTo ? `linear-gradient(90deg, ${color}, ${gradientTo})` : color,
+          boxShadow: `0 0 8px ${color}40`,
+        }}
+      />
+    </div>
+  );
+}
+
 export function GatewayCard({ gateway, dashboard }: GatewayCardProps) {
   const isUp = gateway?.status === "up";
   const score = dashboard?.health_score ?? 0;
 
+  const scoreColor = score >= 7 ? "#34d399" : score >= 4 ? "#fbbf24" : "#f87171";
+  const scoreGradient = score >= 7 ? "#6ee7b7" : score >= 4 ? "#fcd34d" : "#fca5a5";
+
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
-      <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
+    <div className="card-base card-glow-top rounded-2xl p-5">
+      <div className="mb-4 text-[11px] font-medium uppercase tracking-wider text-muted">
         Gateway Status
       </div>
 
       <div className="mb-4 flex items-center gap-3">
         <span
-          className={`inline-flex items-center rounded-md px-3 py-1.5 text-sm font-bold ${
+          className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-bold ${
             gateway === null
-              ? "bg-zinc-800 text-zinc-400"
+              ? "bg-zinc-800/50 text-zinc-400 ring-1 ring-zinc-700/50"
               : isUp
-                ? "bg-green-500/15 text-green-400"
-                : "bg-red-500/15 text-red-400"
+                ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
+                : "bg-red-500/10 text-red-400 ring-1 ring-red-500/20"
           }`}
         >
           {gateway === null ? "NO DATA" : isUp ? "UP" : "DOWN"}
@@ -41,24 +60,15 @@ export function GatewayCard({ gateway, dashboard }: GatewayCardProps) {
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-secondary">Uptime</span>
-            <span className="font-medium">{formatUptime(gateway.uptime_seconds)}</span>
+            <span className="font-mono font-medium">{formatUptime(gateway.uptime_seconds)}</span>
           </div>
 
           <div>
             <div className="mb-1.5 flex items-center justify-between text-sm">
               <span className="text-secondary">Health Score</span>
-              <span className="font-medium">{score}/10</span>
+              <span className="font-mono font-medium">{score}/10</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${score * 10}%`,
-                  backgroundColor:
-                    score >= 7 ? "#22c55e" : score >= 4 ? "#eab308" : "#ef4444",
-                }}
-              />
-            </div>
+            <ProgressBar value={score} max={10} color={scoreColor} gradientTo={scoreGradient} />
           </div>
         </div>
       )}
