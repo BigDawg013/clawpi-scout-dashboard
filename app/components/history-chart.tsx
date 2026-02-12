@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -48,6 +50,8 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export function HistoryChart({ machines }: HistoryChartProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const timeMap = new Map<string, Record<string, number>>();
 
   for (const [machineId, machineData] of Object.entries(machines)) {
@@ -76,75 +80,102 @@ export function HistoryChart({ machines }: HistoryChartProps) {
   // Show ~6 evenly spaced ticks max
   const tickInterval = data.length > 6 ? Math.ceil(data.length / 6) : 0;
 
-  if (data.length === 0) {
-    return (
-      <div className="card-base card-glow-top rounded-xl px-4 py-3">
-        <div className="mb-2.5 text-[10px] font-medium uppercase tracking-wider text-muted">
-          CPU Temperature History (24h)
-        </div>
-        <div className="flex h-36 items-center justify-center text-xs text-muted/60">
-          Collecting data...
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="card-base card-glow-top rounded-xl px-4 py-3">
-      <div className="mb-2.5 text-[10px] font-medium uppercase tracking-wider text-muted">
-        CPU Temperature History (24h)
-      </div>
-      <ResponsiveContainer width="100%" height={200}>
-        <AreaChart data={data} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
-          <defs>
-            {activeMachines.map((id) => (
-              <linearGradient key={id} id={`gradient-${id}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={CHART_COLORS[id]?.fill ?? "#888"} stopOpacity={0.15} />
-                <stop offset="95%" stopColor={CHART_COLORS[id]?.fill ?? "#888"} stopOpacity={0} />
-              </linearGradient>
-            ))}
-          </defs>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="rgba(255, 255, 255, 0.03)"
-            vertical={false}
-          />
-          <XAxis
-            dataKey="time"
-            tick={{ fill: "#63636e", fontSize: 10 }}
-            axisLine={false}
-            tickLine={false}
-            interval={tickInterval}
-          />
-          <YAxis
-            domain={[20, 85]}
-            tick={{ fill: "#63636e", fontSize: 10 }}
-            axisLine={false}
-            tickLine={false}
-            tickFormatter={(v) => `${v}\u00B0`}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          {activeMachines.map((id) => (
-            <Area
-              key={id}
-              type="monotone"
-              dataKey={id}
-              stroke={CHART_COLORS[id]?.stroke ?? "#888"}
-              strokeWidth={1.5}
-              fill={`url(#gradient-${id})`}
-              dot={false}
-              connectNulls
-              activeDot={{ r: 3, strokeWidth: 0, fill: CHART_COLORS[id]?.stroke ?? "#888" }}
-            />
-          ))}
-          <Legend
-            formatter={(value: string) =>
-              MACHINE_META[value as MachineId]?.label ?? value
-            }
-            wrapperStyle={{ fontSize: "11px" }}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
+    <section>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="mx-auto flex w-full max-w-lg items-center justify-center gap-2 rounded-lg px-3 py-1.5 transition-colors hover:bg-white/[0.03] cursor-pointer"
+      >
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-secondary">
+          CPU Temperature History
+        </h2>
+        <span className="text-[11px] text-muted">24h</span>
+        <svg
+          className={`ml-1 h-3 w-3 text-muted/60 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="overflow-hidden"
+          >
+            <div className="pt-2.5">
+              {data.length === 0 ? (
+                <div className="card-base card-glow-top rounded-xl px-4 py-3">
+                  <div className="flex h-36 items-center justify-center text-xs text-muted/60">
+                    Collecting data...
+                  </div>
+                </div>
+              ) : (
+                <div className="card-base card-glow-top rounded-xl px-4 py-3">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <AreaChart data={data} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+                      <defs>
+                        {activeMachines.map((id) => (
+                          <linearGradient key={id} id={`gradient-${id}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={CHART_COLORS[id]?.fill ?? "#888"} stopOpacity={0.15} />
+                            <stop offset="95%" stopColor={CHART_COLORS[id]?.fill ?? "#888"} stopOpacity={0} />
+                          </linearGradient>
+                        ))}
+                      </defs>
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="rgba(255, 255, 255, 0.03)"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="time"
+                        tick={{ fill: "#63636e", fontSize: 10 }}
+                        axisLine={false}
+                        tickLine={false}
+                        interval={tickInterval}
+                      />
+                      <YAxis
+                        domain={[20, 85]}
+                        tick={{ fill: "#63636e", fontSize: 10 }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickFormatter={(v) => `${v}\u00B0`}
+                      />
+                      <Tooltip content={<CustomTooltip />} />
+                      {activeMachines.map((id) => (
+                        <Area
+                          key={id}
+                          type="monotone"
+                          dataKey={id}
+                          stroke={CHART_COLORS[id]?.stroke ?? "#888"}
+                          strokeWidth={1.5}
+                          fill={`url(#gradient-${id})`}
+                          dot={false}
+                          connectNulls
+                          activeDot={{ r: 3, strokeWidth: 0, fill: CHART_COLORS[id]?.stroke ?? "#888" }}
+                        />
+                      ))}
+                      <Legend
+                        formatter={(value: string) =>
+                          MACHINE_META[value as MachineId]?.label ?? value
+                        }
+                        wrapperStyle={{ fontSize: "11px" }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
   );
 }
