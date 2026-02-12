@@ -47,9 +47,9 @@ export interface MachineData {
 export type MachineId = "clawpiscout" | "clawpi" | "macmini";
 
 export const MACHINE_META: Record<MachineId, { label: string; description: string }> = {
-  clawpiscout: { label: "Scout Pi", description: "8GB — watchdog daemon" },
-  clawpi: { label: "ClawPi", description: "4GB — AI gateway" },
-  macmini: { label: "Mac Mini", description: "Hub — multi-agent system" },
+  clawpiscout: { label: "Scout Pi", description: "8GB — AI watchdog & monitor" },
+  clawpi: { label: "ClawPi", description: "4GB — AI inference node" },
+  macmini: { label: "Mac Mini", description: "M4 — neural orchestration hub" },
 };
 
 export interface StatsResponse {
