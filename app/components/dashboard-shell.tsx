@@ -49,13 +49,13 @@ export function DashboardShell() {
 
       <div className="mt-6">
         {MACHINE_ORDER.map((id, index) => (
-          <div key={id} className={index > 0 ? "mt-5 border-t border-border/30 pt-5" : ""}>
-            <MachineSection machineId={id} data={machines[id] ?? null} />
+          <div key={id} className={index > 0 ? "mt-4 border-t border-border/30 pt-4" : ""}>
+            <MachineSection machineId={id} data={machines[id] ?? null} defaultOpen={index === 0} />
           </div>
         ))}
       </div>
 
-      <div className="mx-auto mt-6 max-w-3xl border-t border-border/30 pt-5 space-y-4">
+      <div className="mx-auto mt-6 max-w-lg border-t border-border/30 pt-5 space-y-4">
         <HistoryChart machines={machines} />
         <AlertsList alerts={alerts} />
       </div>
