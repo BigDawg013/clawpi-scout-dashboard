@@ -27,23 +27,23 @@ export function SensorCard({ sensor, dashboard }: SensorCardProps) {
   };
 
   return (
-    <div className="card-base card-glow-top rounded-2xl p-5">
-      <div className="mb-4 text-[11px] font-medium uppercase tracking-wider text-muted">
+    <div className="card-base card-glow-top rounded-xl px-4 py-3">
+      <div className="mb-2.5 text-[10px] font-medium uppercase tracking-wider text-muted">
         Environment & Display
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <div className="mb-1 text-xs text-muted">Temperature</div>
-          <div className="font-mono text-lg font-bold">
+          <div className="mb-0.5 text-[11px] text-muted">Temperature</div>
+          <div className="font-mono text-base font-bold">
             {sensor?.temperature !== null && sensor?.temperature !== undefined
               ? formatTemp(sensor.temperature)
               : "--"}
           </div>
         </div>
         <div>
-          <div className="mb-1 text-xs text-muted">Humidity</div>
-          <div className="font-mono text-lg font-bold">
+          <div className="mb-0.5 text-[11px] text-muted">Humidity</div>
+          <div className="font-mono text-base font-bold">
             {sensor?.humidity !== null && sensor?.humidity !== undefined
               ? `${sensor.humidity.toFixed(0)}%`
               : "--"}
@@ -51,21 +51,21 @@ export function SensorCard({ sensor, dashboard }: SensorCardProps) {
         </div>
 
         <div>
-          <div className="mb-1 text-xs text-muted">LED Status</div>
-          <div className="flex items-center gap-2">
+          <div className="mb-0.5 text-[11px] text-muted">LED Status</div>
+          <div className="flex items-center gap-1.5">
             <span
-              className="inline-block h-3 w-3 rounded-full"
+              className="inline-block h-2.5 w-2.5 rounded-full"
               style={{
                 backgroundColor: ledColor,
-                boxShadow: dashboard?.led_state !== "off" ? `0 0 12px ${ledColor}50` : "none",
+                boxShadow: dashboard?.led_state !== "off" ? `0 0 8px ${ledColor}50` : "none",
               }}
             />
-            <span className="text-sm capitalize">{dashboard?.led_state ?? "off"}</span>
+            <span className="text-xs capitalize">{dashboard?.led_state ?? "off"}</span>
           </div>
         </div>
         <div>
-          <div className="mb-1 text-xs text-muted">Matrix</div>
-          <div className="font-mono text-lg font-bold">
+          <div className="mb-0.5 text-[11px] text-muted">Matrix</div>
+          <div className="font-mono text-base font-bold">
             {dashboard?.matrix_pattern
               ? matrixLabel[dashboard.matrix_pattern] ?? dashboard.matrix_pattern
               : "--"}

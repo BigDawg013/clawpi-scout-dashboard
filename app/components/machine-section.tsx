@@ -14,8 +14,8 @@ interface MachineSectionProps {
 }
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 };
 
 export function MachineSection({ machineId, data }: MachineSectionProps) {
@@ -27,25 +27,25 @@ export function MachineSection({ machineId, data }: MachineSectionProps) {
 
   return (
     <section id={machineId}>
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-2.5 flex items-center gap-2">
         <span
           className={`status-dot ${online ? "status-dot-pulse" : ""}`}
           style={{ backgroundColor: dotColor, color: dotColor }}
         />
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-secondary">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-secondary">
           {meta.label}
         </h2>
-        <span className="text-xs text-muted">{meta.description}</span>
+        <span className="hidden text-[11px] text-muted sm:inline">{meta.description}</span>
         {current && (
-          <span className="ml-auto text-xs font-mono text-muted">
+          <span className="ml-auto text-[11px] font-mono text-muted">
             {formatRelativeTime(current.ts)}
           </span>
         )}
       </div>
 
       {!current ? (
-        <div className="card-base card-glow-top rounded-2xl p-5">
-          <p className="text-sm text-muted">Waiting for data from {meta.label}...</p>
+        <div className="card-base card-glow-top rounded-xl px-4 py-3">
+          <p className="text-xs text-muted">Waiting for data from {meta.label}...</p>
         </div>
       ) : (() => {
         const hasGateway = !!current.gateway;
@@ -55,10 +55,10 @@ export function MachineSection({ machineId, data }: MachineSectionProps) {
 
         return (
           <motion.div
-            className={useGrid ? "grid gap-5 sm:grid-cols-2" : "max-w-xl"}
+            className={useGrid ? "grid gap-3 sm:grid-cols-2" : "max-w-lg"}
             initial="hidden"
             animate="visible"
-            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
           >
             {hasGateway && (
               <motion.div variants={cardVariants}>

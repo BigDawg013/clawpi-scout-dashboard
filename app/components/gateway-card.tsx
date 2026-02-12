@@ -11,13 +11,13 @@ interface GatewayCardProps {
 function ProgressBar({ value, max, color, gradientTo }: { value: number; max: number; color: string; gradientTo?: string }) {
   const pct = Math.min((value / max) * 100, 100);
   return (
-    <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
+    <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
       <div
         className="h-full rounded-full transition-all duration-700 ease-out"
         style={{
           width: `${pct}%`,
           background: gradientTo ? `linear-gradient(90deg, ${color}, ${gradientTo})` : color,
-          boxShadow: `0 0 8px ${color}40`,
+          boxShadow: `0 0 6px ${color}30`,
         }}
       />
     </div>
@@ -32,14 +32,14 @@ export function GatewayCard({ gateway, dashboard }: GatewayCardProps) {
   const scoreGradient = score >= 7 ? "#6ee7b7" : score >= 4 ? "#fcd34d" : "#fca5a5";
 
   return (
-    <div className="card-base card-glow-top rounded-2xl p-5">
-      <div className="mb-4 text-[11px] font-medium uppercase tracking-wider text-muted">
+    <div className="card-base card-glow-top rounded-xl px-4 py-3">
+      <div className="mb-2.5 text-[10px] font-medium uppercase tracking-wider text-muted">
         Gateway Status
       </div>
 
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-3 flex items-center gap-2">
         <span
-          className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-bold ${
+          className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold ${
             gateway === null
               ? "bg-zinc-800/50 text-zinc-400 ring-1 ring-zinc-700/50"
               : isUp
@@ -49,22 +49,22 @@ export function GatewayCard({ gateway, dashboard }: GatewayCardProps) {
         >
           {gateway === null ? "NO DATA" : isUp ? "UP" : "DOWN"}
         </span>
-        {gateway && (
-          <span className="text-sm text-secondary">
-            {gateway.consecutive_ok > 0 && `${gateway.consecutive_ok} consecutive OK`}
+        {gateway && gateway.consecutive_ok > 0 && (
+          <span className="text-[11px] text-secondary">
+            {gateway.consecutive_ok} consecutive OK
           </span>
         )}
       </div>
 
       {gateway && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm">
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between text-xs">
             <span className="text-secondary">Uptime</span>
             <span className="font-mono font-medium">{formatUptime(gateway.uptime_seconds)}</span>
           </div>
 
           <div>
-            <div className="mb-1.5 flex items-center justify-between text-sm">
+            <div className="mb-1 flex items-center justify-between text-xs">
               <span className="text-secondary">Health Score</span>
               <span className="font-mono font-medium">{score}/10</span>
             </div>
@@ -74,7 +74,7 @@ export function GatewayCard({ gateway, dashboard }: GatewayCardProps) {
       )}
 
       {!gateway && (
-        <p className="text-sm text-muted">Waiting for data from scout...</p>
+        <p className="text-xs text-muted">Waiting for data from scout...</p>
       )}
     </div>
   );

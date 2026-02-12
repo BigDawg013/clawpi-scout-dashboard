@@ -45,8 +45,8 @@ body {
   border: 1px solid var(--color-border);
   box-shadow:
     0 0 0 0.5px rgba(255, 255, 255, 0.03),
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    0 8px 24px rgba(0, 0, 0, 0.15);
+    0 1px 4px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.1);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -54,8 +54,8 @@ body {
   border-color: #2a2a32;
   box-shadow:
     0 0 0 0.5px rgba(255, 255, 255, 0.05),
-    0 4px 12px rgba(0, 0, 0, 0.35),
-    0 12px 32px rgba(0, 0, 0, 0.2);
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .card-glow-top {
@@ -84,8 +84,8 @@ body {
 .status-dot {
   position: relative;
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 9999px;
   flex-shrink: 0;
 }
@@ -93,19 +93,19 @@ body {
 .status-dot::before {
   content: "";
   position: absolute;
-  inset: -3px;
+  inset: -2px;
   border-radius: 9999px;
-  opacity: 0.4;
+  opacity: 0.35;
   background: inherit;
-  filter: blur(4px);
+  filter: blur(3px);
 }
 
 .status-dot-pulse::after {
   content: "";
   position: absolute;
-  inset: -4px;
+  inset: -3px;
   border-radius: 9999px;
-  border: 1.5px solid currentColor;
+  border: 1px solid currentColor;
   opacity: 0;
   animation: ring-pulse 2.5s ease-out infinite;
 }
