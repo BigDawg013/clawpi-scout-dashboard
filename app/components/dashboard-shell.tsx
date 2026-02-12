@@ -55,7 +55,7 @@ export function DashboardShell() {
         ))}
       </div>
 
-      <div className="mt-6 border-t border-border/30 pt-5 space-y-4">
+      <div className="mx-auto mt-6 max-w-3xl border-t border-border/30 pt-5 space-y-4">
         <HistoryChart machines={machines} />
         <AlertsList alerts={alerts} />
       </div>
