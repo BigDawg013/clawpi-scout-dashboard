@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { MACHINE_META } from "@/lib/types";
 import type { MachineId, MachineData } from "@/lib/types";
 import { formatRelativeTime } from "@/lib/utils";
-import { GatewayCard } from "./gateway-card";
 import { VitalsCard } from "./vitals-card";
 import { SensorCard } from "./sensor-card";
 
@@ -48,28 +47,21 @@ export function MachineSection({ machineId, data }: MachineSectionProps) {
           <p className="text-xs text-muted">Waiting for data from {meta.label}...</p>
         </div>
       ) : (() => {
-        const hasGateway = !!current.gateway;
         const hasSensor = !!(current.sensor && (current.sensor.temperature !== null || current.sensor.humidity !== null));
-        const cardCount = (hasGateway ? 1 : 0) + 1 + (hasSensor ? 1 : 0);
-        const useGrid = cardCount >= 2;
 
         return (
           <motion.div
-            className={useGrid ? "grid gap-3 sm:grid-cols-2" : "max-w-lg"}
+            className={hasSensor ? "grid gap-3 sm:grid-cols-2" : "max-w-lg"}
             initial="hidden"
             animate="visible"
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
           >
-            {hasGateway && (
-              <motion.div variants={cardVariants}>
-                <GatewayCard
-                  gateway={current.gateway!}
-                  dashboard={current.dashboard ?? null}
-                />
-              </motion.div>
-            )}
             <motion.div variants={cardVariants}>
-              <VitalsCard system={current.system} />
+              <VitalsCard
+                system={current.system}
+                gateway={current.gateway ?? null}
+                dashboard={current.dashboard ?? null}
+              />
             </motion.div>
             {hasSensor && (
               <motion.div variants={cardVariants}>
