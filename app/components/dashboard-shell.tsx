@@ -49,7 +49,7 @@ export function DashboardShell() {
 
       <div className="mt-8">
         {MACHINE_ORDER.map((id, index) => (
-          <div key={id} className={index > 0 ? "mt-10 border-t border-border/40 pt-10" : ""}>
+          <div key={id} className={index > 0 ? "mt-8 border-t border-border/40 pt-8" : ""}>
             <MachineSection machineId={id} data={machines[id] ?? null} />
           </div>
         ))}

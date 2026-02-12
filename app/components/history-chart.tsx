@@ -57,7 +57,9 @@ export function HistoryChart({ machines }: HistoryChartProps) {
         minute: "2-digit",
       });
       const existing = timeMap.get(timeKey) || { ts: entry.ts };
-      existing[machineId] = entry.system.cpu_temp;
+      if (entry.system.cpu_temp > 0) {
+        existing[machineId] = entry.system.cpu_temp;
+      }
       existing.ts = Math.max(existing.ts as number, entry.ts);
       timeMap.set(timeKey, existing);
     }

@@ -1,12 +1,35 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(npm run build)",
-      "Bash(npm run dev)",
-      "Bash(npm run lint)",
-      "Bash(git *)",
-      "Bash(gh pr *)",
-      "Bash(curl *clawpi-scout-dashboard.vercel.app*)"
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "case \"$TOOL_INPUT\" in *\\.env*|*credentials*|*secret*|*API_KEY*|*TOKEN*) echo 'BLOCKED: Do not read, commit, or expose secrets/env files' >&2; exit 1;; esac"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$TOOL_INPUT\" | grep -qiE '\\.(env|pem|key)' && echo 'BLOCKED: Cannot write secret files' >&2 && exit 1 || exit 0"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "case \"$TOOL_INPUT\" in *'git push'*main*|*'git push origin main'*) echo 'BLOCKED: Use PR workflow — never push directly to main' >&2; exit 1;; esac"
+          }
+        ]
+      }
     ]
   }
 }
