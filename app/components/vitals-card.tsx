@@ -1,10 +1,12 @@
 "use client";
 
-import type { SystemStats } from "@/lib/types";
-import { formatTemp, formatMemory } from "@/lib/utils";
+import type { SystemStats, GatewayStats, DashboardState } from "@/lib/types";
+import { formatTemp, formatMemory, formatUptime } from "@/lib/utils";
 
 interface VitalsCardProps {
   system: SystemStats | null;
+  gateway?: GatewayStats | null;
+  dashboard?: DashboardState | null;
 }
 
 function ProgressBar({ value, max, color, gradientTo }: { value: number; max: number; color: string; gradientTo?: string }) {
@@ -29,7 +31,7 @@ function getGradientPair(value: number, thresholds: [number, number]): { color: 
   return { color: "#34d399", gradientTo: "#6ee7b7" };
 }
 
-export function VitalsCard({ system }: VitalsCardProps) {
+export function VitalsCard({ system, gateway, dashboard }: VitalsCardProps) {
   if (!system) {
     return (
       <div className="card-base card-glow-top rounded-xl px-4 py-3">
@@ -49,11 +51,48 @@ export function VitalsCard({ system }: VitalsCardProps) {
   const memColors = getGradientPair(memPct, [60, 85]);
   const diskColors = getGradientPair(system.disk_used_pct, [60, 85]);
 
+  const isUp = gateway?.status === "up";
+  const score = dashboard?.health_score ?? 0;
+  const scoreColor = score >= 7 ? "#34d399" : score >= 4 ? "#fbbf24" : "#f87171";
+  const scoreGradient = score >= 7 ? "#6ee7b7" : score >= 4 ? "#fcd34d" : "#fca5a5";
+
   return (
     <div className="card-base card-glow-top rounded-xl px-4 py-3">
       <div className="mb-2.5 text-[10px] font-medium uppercase tracking-wider text-muted">
         System Vitals
       </div>
+
+      {/* Gateway status inline — only for Scout Pi */}
+      {gateway && (
+        <div className="mb-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-secondary">Gateway</span>
+            <span
+              className={`inline-flex items-center rounded-md px-1.5 py-px text-[11px] font-bold ${
+                isUp
+                  ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
+                  : "bg-red-500/10 text-red-400 ring-1 ring-red-500/20"
+              }`}
+            >
+              {isUp ? "UP" : "DOWN"}
+            </span>
+            {gateway.consecutive_ok > 0 && (
+              <span className="text-[11px] text-muted">{gateway.consecutive_ok} OK</span>
+            )}
+            <span className="ml-auto font-mono text-xs font-medium text-secondary">
+              {formatUptime(gateway.uptime_seconds)}
+            </span>
+          </div>
+          <div>
+            <div className="mb-1 flex items-center justify-between text-xs">
+              <span className="text-secondary">Health</span>
+              <span className="font-mono font-medium">{score}/10</span>
+            </div>
+            <ProgressBar value={score} max={10} color={scoreColor} gradientTo={scoreGradient} />
+          </div>
+          <div className="border-t border-border/30" />
+        </div>
+      )}
 
       <div className="space-y-2.5">
         {system.cpu_temp > 0 && (
