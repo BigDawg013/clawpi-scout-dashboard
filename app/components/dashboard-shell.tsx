@@ -55,53 +55,53 @@ export function DashboardShell() {
         ))}
       </div>
 
-      <div className="mt-6 border-t border-border/30 pt-5 grid gap-4 lg:grid-cols-5">
-        <div className="lg:col-span-3">
-          <HistoryChart machines={machines} />
-        </div>
-        <div className="lg:col-span-2">
-          <AlertsList alerts={alerts} />
-        </div>
+      <div className="mt-6 border-t border-border/30 pt-5 space-y-4">
+        <HistoryChart machines={machines} />
+        <AlertsList alerts={alerts} />
       </div>
 
-      <footer className="mt-8 border-t border-border/30 pt-4 pb-3 text-center text-xs text-muted/70">
-        Built by{" "}
-        <a
-          href="https://github.com/BigDawg013"
-          className="hover:text-secondary transition-colors"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          BigDawg
-        </a>
-        {" "}&middot;{" "}
-        <a
-          href="https://github.com/BigDawg013/clawpi-scout"
-          className="hover:text-secondary transition-colors"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          clawpi-scout
-        </a>
-        {" "}&middot;{" "}
-        <a
-          href="https://github.com/BigDawg013/clawpi-scout-dashboard"
-          className="hover:text-secondary transition-colors"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          dashboard source
-        </a>
-        {" "}&middot;{" "}
-        Powered by{" "}
-        <a
-          href="https://openclaw.ai"
-          className="hover:text-secondary transition-colors"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          OpenClaw
-        </a>
+      <footer className="mt-10 border-t border-border/20 pt-5 pb-4">
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="font-semibold text-secondary">ClawPi Scout</span>
+            <span className="text-muted/40">/</span>
+            <span className="text-muted/60">System Monitoring</span>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted/50">
+            <a
+              href="https://github.com/BigDawg013"
+              className="hover:text-secondary transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Built by BigDawg
+            </a>
+            <a
+              href="https://github.com/BigDawg013/clawpi-scout"
+              className="hover:text-secondary transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Source
+            </a>
+            <a
+              href="https://github.com/BigDawg013/clawpi-scout-dashboard"
+              className="hover:text-secondary transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Dashboard
+            </a>
+            <a
+              href="https://openclaw.ai"
+              className="hover:text-secondary transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Powered by OpenClaw
+            </a>
+          </div>
+        </div>
       </footer>
     </motion.div>
   );
