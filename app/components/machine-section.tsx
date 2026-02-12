@@ -47,34 +47,41 @@ export function MachineSection({ machineId, data }: MachineSectionProps) {
         <div className="card-base card-glow-top rounded-2xl p-5">
           <p className="text-sm text-muted">Waiting for data from {meta.label}...</p>
         </div>
-      ) : (
-        <motion.div
-          className="grid gap-5 sm:grid-cols-2"
-          initial="hidden"
-          animate="visible"
-          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
-        >
-          {current.gateway && (
+      ) : (() => {
+        const hasGateway = !!current.gateway;
+        const hasSensor = !!(current.sensor && (current.sensor.temperature !== null || current.sensor.humidity !== null));
+        const cardCount = (hasGateway ? 1 : 0) + 1 + (hasSensor ? 1 : 0);
+        const useGrid = cardCount >= 2;
+
+        return (
+          <motion.div
+            className={useGrid ? "grid gap-5 sm:grid-cols-2" : "max-w-xl"}
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+          >
+            {hasGateway && (
+              <motion.div variants={cardVariants}>
+                <GatewayCard
+                  gateway={current.gateway!}
+                  dashboard={current.dashboard ?? null}
+                />
+              </motion.div>
+            )}
             <motion.div variants={cardVariants}>
-              <GatewayCard
-                gateway={current.gateway}
-                dashboard={current.dashboard ?? null}
-              />
+              <VitalsCard system={current.system} />
             </motion.div>
-          )}
-          <motion.div variants={cardVariants}>
-            <VitalsCard system={current.system} />
+            {hasSensor && (
+              <motion.div variants={cardVariants}>
+                <SensorCard
+                  sensor={current.sensor!}
+                  dashboard={current.dashboard ?? null}
+                />
+              </motion.div>
+            )}
           </motion.div>
-          {current.sensor && (current.sensor.temperature !== null || current.sensor.humidity !== null) && (
-            <motion.div variants={cardVariants}>
-              <SensorCard
-                sensor={current.sensor}
-                dashboard={current.dashboard ?? null}
-              />
-            </motion.div>
-          )}
-        </motion.div>
-      )}
+        );
+      })()}
     </section>
   );
 }
