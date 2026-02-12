@@ -68,12 +68,12 @@ export function DashboardShell() {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted/50">
             <a
-              href="https://github.com/BigDawg013"
+              href="https://github.com/RChursin"
               className="hover:text-secondary transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Built by BigDawg
+              Built by RChursin
             </a>
             <a
               href="https://github.com/BigDawg013/clawpi-scout"
