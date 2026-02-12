@@ -24,7 +24,7 @@ export function DashboardShell() {
   if (error) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-        <StatusHeader machines={{}} latestTs={0} isLoading={false} monitoringSince={null} />
+        <StatusHeader machines={{}} latestTs={0} isLoading={false} />
         <div className="mt-6 card-base card-glow-top rounded-xl p-5 text-center">
           <p className="text-down text-sm">Failed to load dashboard data</p>
           <p className="mt-1 text-xs text-muted">Check API route and Redis connection</p>
@@ -44,7 +44,6 @@ export function DashboardShell() {
         machines={machines}
         latestTs={latestTs}
         isLoading={isLoading}
-        monitoringSince={data?.monitoring_since ?? null}
       />
 
       <div className="mt-6">
