@@ -9,41 +9,59 @@ interface StatusHeaderProps {
   isLoading: boolean;
 }
 
+type SystemStatus = "active" | "warning" | "down";
+
+function getSystemStatus(machines: Record<string, MachineData>, latestTs: number, isLoading: boolean): SystemStatus {
+  if (isLoading) return "warning";
+  const ids = Object.keys(MACHINE_META) as MachineId[];
+  const statuses = ids.map((id) => {
+    const current = machines[id]?.current;
+    if (!current) return "down" as const;
+    return (Date.now() / 1000 - current.ts) < 300 ? "active" as const : "down" as const;
+  });
+  if (statuses.every((s) => s === "down")) return "down";
+  if (statuses.some((s) => s === "down")) return "warning";
+  return "active";
+}
+
+const STATUS_CONFIG: Record<SystemStatus, { label: string; bg: string; text: string; dot: string }> = {
+  active: {
+    label: "All Systems Active",
+    bg: "bg-emerald-500/10 border-emerald-500/20",
+    text: "text-emerald-400",
+    dot: "#34d399",
+  },
+  warning: {
+    label: "Partial Outage",
+    bg: "bg-amber-500/10 border-amber-500/20",
+    text: "text-amber-400",
+    dot: "#fbbf24",
+  },
+  down: {
+    label: "Systems Down",
+    bg: "bg-red-500/10 border-red-500/20",
+    text: "text-red-400",
+    dot: "#f87171",
+  },
+};
+
 export function StatusHeader({ machines, latestTs, isLoading }: StatusHeaderProps) {
-  const isStale = latestTs ? Date.now() / 1000 - latestTs > 300 : true;
-  const dotColor = isLoading ? "#fbbf24" : isStale ? "#f87171" : "#34d399";
+  const status = getSystemStatus(machines, latestTs, isLoading);
+  const config = STATUS_CONFIG[status];
 
   return (
     <header className="text-center">
-      <div className="flex items-center justify-center gap-2">
-        <h1 className="text-lg font-semibold tracking-tight">ClawPi Scout</h1>
+      <h1 className="text-lg font-semibold tracking-tight">ClawPi Scout</h1>
+      <div
+        className={`mt-2.5 mx-auto inline-flex items-center gap-2 rounded-full border px-3.5 py-1 ${config.bg}`}
+      >
         <span
-          className={`status-dot ${!isLoading && !isStale ? "status-dot-pulse" : ""}`}
-          style={{ backgroundColor: dotColor, color: dotColor }}
+          className={`status-dot ${status === "active" ? "status-dot-pulse" : ""}`}
+          style={{ backgroundColor: config.dot, color: config.dot }}
         />
-      </div>
-
-      <div className="mt-2.5 flex flex-wrap justify-center gap-1.5">
-        {(Object.keys(MACHINE_META) as MachineId[]).map((id) => {
-          const data = machines[id];
-          const current = data?.current;
-          const online = current && (Date.now() / 1000 - current.ts) < 300;
-          const badgeDotColor = !current ? "#3f3f46" : online ? "#34d399" : "#f87171";
-
-          return (
-            <a
-              key={id}
-              href={`#${id}`}
-              className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs transition-colors hover:bg-white/[0.04]"
-            >
-              <span
-                className="status-dot"
-                style={{ backgroundColor: badgeDotColor, color: badgeDotColor }}
-              />
-              <span className="text-secondary">{MACHINE_META[id].label}</span>
-            </a>
-          );
-        })}
+        <span className={`text-xs font-medium ${config.text}`}>
+          {config.label}
+        </span>
       </div>
     </header>
   );
