@@ -65,6 +65,16 @@ export function DashboardShell() {
       </div>
 
       <footer className="mt-8 border-t border-border/30 pt-4 pb-3 text-center text-xs text-muted/70">
+        Built by{" "}
+        <a
+          href="https://github.com/BigDawg013"
+          className="hover:text-secondary transition-colors"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          BigDawg
+        </a>
+        {" "}&middot;{" "}
         <a
           href="https://github.com/BigDawg013/clawpi-scout"
           className="hover:text-secondary transition-colors"
