@@ -17,8 +17,8 @@ export function StatusHeader({ machines, latestTs, isLoading, monitoringSince }:
   const dotColor = isLoading ? "#fbbf24" : isStale ? "#f87171" : "#34d399";
 
   return (
-    <header>
-      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+    <header className="text-center">
+      <div className="flex flex-col items-center gap-1.5">
         <div className="flex items-center gap-2.5">
           <h1 className="text-lg font-semibold tracking-tight sm:text-xl">ClawPi Scout</h1>
           <span
@@ -42,7 +42,7 @@ export function StatusHeader({ machines, latestTs, isLoading, monitoringSince }:
       </div>
 
       {/* Machine status badges */}
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <div className="mt-3 flex flex-wrap justify-center gap-1.5">
         {(Object.keys(MACHINE_META) as MachineId[]).map((id) => {
           const meta = MACHINE_META[id];
           const data = machines[id];

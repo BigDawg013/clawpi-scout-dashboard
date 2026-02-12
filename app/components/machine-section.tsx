@@ -26,7 +26,7 @@ export function MachineSection({ machineId, data }: MachineSectionProps) {
 
   return (
     <section id={machineId}>
-      <div className="mb-2.5 flex items-center gap-2">
+      <div className="mb-2.5 flex items-center justify-center gap-2">
         <span
           className={`status-dot ${online ? "status-dot-pulse" : ""}`}
           style={{ backgroundColor: dotColor, color: dotColor }}
@@ -36,14 +36,14 @@ export function MachineSection({ machineId, data }: MachineSectionProps) {
         </h2>
         <span className="hidden text-[11px] text-muted sm:inline">{meta.description}</span>
         {current && (
-          <span className="ml-auto text-[11px] font-mono text-muted">
-            {formatRelativeTime(current.ts)}
+          <span className="text-[11px] font-mono text-muted">
+            &middot; {formatRelativeTime(current.ts)}
           </span>
         )}
       </div>
 
       {!current ? (
-        <div className="card-base card-glow-top rounded-xl px-4 py-3">
+        <div className="mx-auto max-w-lg card-base card-glow-top rounded-xl px-4 py-3 text-center">
           <p className="text-xs text-muted">Waiting for data from {meta.label}...</p>
         </div>
       ) : (() => {
@@ -51,7 +51,7 @@ export function MachineSection({ machineId, data }: MachineSectionProps) {
 
         return (
           <motion.div
-            className={hasSensor ? "grid gap-3 sm:grid-cols-2" : "max-w-lg"}
+            className={hasSensor ? "mx-auto max-w-3xl grid gap-3 sm:grid-cols-2" : "mx-auto max-w-lg"}
             initial="hidden"
             animate="visible"
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
