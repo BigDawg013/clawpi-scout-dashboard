@@ -1,6 +1,7 @@
 "use client";
 
-import type { AlertEntry } from "@/lib/types";
+import type { AlertEntry, MachineId } from "@/lib/types";
+import { MACHINE_META } from "@/lib/types";
 import { formatRelativeTime } from "@/lib/utils";
 
 interface AlertsListProps {
@@ -19,8 +20,10 @@ export function AlertsList({ alerts }: AlertsListProps) {
       ) : (
         <div className="max-h-60 space-y-2 overflow-y-auto">
           {alerts.map((alert, i) => {
-            const isRecovery =
-              alert.key === "recovery" || alert.message.toLowerCase().includes("recover");
+            const isRecovery = alert.message.toLowerCase().includes("recover");
+            const machineLabel = alert.machine
+              ? MACHINE_META[alert.machine as MachineId]?.label ?? alert.machine
+              : null;
             return (
               <div
                 key={`${alert.ts}-${i}`}
@@ -34,6 +37,11 @@ export function AlertsList({ alerts }: AlertsListProps) {
                 <div className="min-w-0 flex-1">
                   <p className="break-words text-foreground">{alert.message}</p>
                   <p className="mt-0.5 text-xs text-muted">
+                    {machineLabel && (
+                      <span className="mr-2 rounded bg-zinc-800 px-1.5 py-0.5">
+                        {machineLabel}
+                      </span>
+                    )}
                     {formatRelativeTime(alert.ts)}
                   </p>
                 </div>

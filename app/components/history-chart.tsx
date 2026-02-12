@@ -1,34 +1,57 @@
 "use client";
 
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
-import type { ScoutPayload } from "@/lib/types";
+import { MACHINE_META } from "@/lib/types";
+import type { MachineData, MachineId } from "@/lib/types";
 
 interface HistoryChartProps {
-  history: ScoutPayload[];
+  machines: Record<string, MachineData>;
 }
 
-export function HistoryChart({ history }: HistoryChartProps) {
-  const data = history.map((entry) => ({
-    time: new Date(entry.ts * 1000).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    health: entry.dashboard.health_score,
-    temp: entry.system.cpu_temp,
-  }));
+const COLORS: Record<string, string> = {
+  clawpiscout: "#22c55e",
+  clawpi: "#06b6d4",
+  macmini: "#a855f7",
+};
+
+export function HistoryChart({ machines }: HistoryChartProps) {
+  // Merge all machine histories into a unified timeline
+  const timeMap = new Map<string, Record<string, number>>();
+
+  for (const [machineId, machineData] of Object.entries(machines)) {
+    for (const entry of machineData.history) {
+      const timeKey = new Date(entry.ts * 1000).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const existing = timeMap.get(timeKey) || { ts: entry.ts };
+      existing[machineId] = entry.system.cpu_temp;
+      existing.ts = Math.max(existing.ts as number, entry.ts);
+      timeMap.set(timeKey, existing);
+    }
+  }
+
+  const data = Array.from(timeMap.entries())
+    .sort((a, b) => (a[1].ts as number) - (b[1].ts as number))
+    .map(([time, values]) => ({ time, ...values }));
+
+  const activeMachines = Object.keys(machines).filter(
+    (id) => machines[id].history.length > 0
+  );
 
   if (data.length === 0) {
     return (
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
-          Health History (24h)
+          CPU Temperature History (24h)
         </div>
         <div className="flex h-40 items-center justify-center text-sm text-muted">
           Collecting data...
@@ -40,20 +63,10 @@ export function HistoryChart({ history }: HistoryChartProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
-        Health History (24h)
+        CPU Temperature History (24h)
       </div>
-      <ResponsiveContainer width="100%" height={180}>
-        <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-          <defs>
-            <linearGradient id="healthGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="tempGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.2} />
-              <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-            </linearGradient>
-          </defs>
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
           <XAxis
             dataKey="time"
             tick={{ fill: "#71717a", fontSize: 11 }}
@@ -62,20 +75,11 @@ export function HistoryChart({ history }: HistoryChartProps) {
             interval="preserveStartEnd"
           />
           <YAxis
-            yAxisId="health"
-            domain={[0, 10]}
-            tick={{ fill: "#71717a", fontSize: 11 }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis
-            yAxisId="temp"
-            orientation="right"
             domain={[20, 85]}
             tick={{ fill: "#71717a", fontSize: 11 }}
             axisLine={false}
             tickLine={false}
-            hide
+            tickFormatter={(v) => `${v}°`}
           />
           <Tooltip
             contentStyle={{
@@ -85,35 +89,31 @@ export function HistoryChart({ history }: HistoryChartProps) {
               fontSize: "12px",
               color: "#fafafa",
             }}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            formatter={(value: any, name: any) => [
+              typeof value === "number" ? `${value.toFixed(1)}°C` : "--",
+              MACHINE_META[name as MachineId]?.label ?? name,
+            ]}
           />
-          <Area
-            yAxisId="health"
-            type="monotone"
-            dataKey="health"
-            stroke="#22c55e"
-            fill="url(#healthGrad)"
-            strokeWidth={2}
-            name="Health"
+          <Legend
+            formatter={(value: string) =>
+              MACHINE_META[value as MachineId]?.label ?? value
+            }
+            wrapperStyle={{ fontSize: "12px" }}
           />
-          <Area
-            yAxisId="temp"
-            type="monotone"
-            dataKey="temp"
-            stroke="#06b6d4"
-            fill="url(#tempGrad)"
-            strokeWidth={1.5}
-            name="CPU Temp"
-          />
-        </AreaChart>
+          {activeMachines.map((id) => (
+            <Line
+              key={id}
+              type="monotone"
+              dataKey={id}
+              stroke={COLORS[id] || "#888"}
+              strokeWidth={2}
+              dot={false}
+              connectNulls
+            />
+          ))}
+        </LineChart>
       </ResponsiveContainer>
-      <div className="mt-2 flex gap-4 text-xs text-muted">
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2 w-2 rounded-full bg-green-500" /> Health Score
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2 w-2 rounded-full bg-cyan-500" /> CPU Temp
-        </span>
-      </div>
     </div>
   );
 }

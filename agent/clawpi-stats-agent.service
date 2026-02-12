@@ -1,0 +1,15 @@
+[Unit]
+Description=ClawPi Scout Stats Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=bigdawg
+WorkingDirectory=/home/bigdawg/stats-agent
+ExecStart=/usr/bin/python3 /home/bigdawg/stats-agent/stats_agent.py --config /home/bigdawg/stats-agent/agent.yaml
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

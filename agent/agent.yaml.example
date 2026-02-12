@@ -1,0 +1,8 @@
+# ClawPi Scout Dashboard — Stats Agent Config
+# Copy to agent.yaml and fill in your values.
+# agent.yaml is gitignored.
+
+url: "https://clawpi-scout-dashboard.vercel.app/api/stats"
+api_key: ""              # Same as SCOUT_API_KEY on Vercel
+machine_id: "clawpi"     # clawpi | macmini
+push_interval: 60        # seconds

@@ -26,21 +26,34 @@ export interface DashboardState {
 export interface AlertEntry {
   ts: number;
   message: string;
-  key: string;
+  machine?: string;
 }
 
 export interface ScoutPayload {
   ts: number;
-  gateway: GatewayStats;
+  machine?: string;
+  gateway?: GatewayStats;
   system: SystemStats;
-  sensor: SensorStats;
-  dashboard: DashboardState;
-  alerts: AlertEntry[];
+  sensor?: SensorStats;
+  dashboard?: DashboardState;
+  alerts?: AlertEntry[];
 }
 
-export interface StatsResponse {
+export interface MachineData {
   current: ScoutPayload | null;
   history: ScoutPayload[];
+}
+
+export type MachineId = "clawpiscout" | "clawpi" | "macmini";
+
+export const MACHINE_META: Record<MachineId, { label: string; description: string }> = {
+  clawpiscout: { label: "Scout Pi", description: "8GB — watchdog daemon" },
+  clawpi: { label: "ClawPi", description: "4GB — AI gateway" },
+  macmini: { label: "Mac Mini", description: "Hub — multi-agent system" },
+};
+
+export interface StatsResponse {
+  machines: Record<string, MachineData>;
   alerts: AlertEntry[];
   monitoring_since: string | null;
 }
