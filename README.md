@@ -1,48 +1,55 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/framework-Next.js%2015-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/framework-Next.js%2016-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/styling-Tailwind%20CSS%20v4-38bdf8?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/storage-Upstash%20Redis-00e9a3?style=flat-square&logo=redis&logoColor=white" alt="Upstash" />
   <img src="https://img.shields.io/badge/deploy-Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" />
   <img src="https://img.shields.io/badge/data-Raspberry%20Pi-c51a4a?style=flat-square&logo=raspberrypi&logoColor=white" alt="Raspberry Pi" />
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="MIT License" />
 </p>
 
-# clawpi-scout-dashboard
+# ClawPi Scout Dashboard
 
-Real-time status dashboard for [clawpi-scout](https://github.com/BigDawg013/clawpi-scout) — a Raspberry Pi watchdog daemon that monitors an OpenClaw AI gateway.
+Real-time system monitoring dashboard for the ClawPi ecosystem — three machines pushing stats every 60 seconds, visualized with a glassmorphism dark UI.
 
-The Pi pushes stats every 60 seconds. The dashboard auto-refreshes every 30 seconds.
+**Live:** [clawpi-scout-dashboard.vercel.app](https://clawpi-scout-dashboard.vercel.app)
+
+---
+
+## Machines
+
+| Machine | Hardware | Role |
+|---------|----------|------|
+| **Scout Pi** | 8GB Raspberry Pi | AI watchdog & monitor |
+| **Claw Pi** | 4GB Raspberry Pi | AI inference node |
+| **Mac Mini** | M4 | Neural orchestration hub |
 
 ---
 
 ## How it works
 
 ```
-Scout Pi                              Vercel
-+------------------+  POST /api/stats  +------------------------+
-| stats_pusher.py  | ----------------> | Next.js API Route      |
-| every 60s        |   Bearer API_KEY  | Store in Upstash Redis |
-+------------------+                   +-----------+------------+
-                                                   |
-                                        GET /api/stats (public)
-                                                   |
-                                       +-----------v------------+
-                                       | Dashboard UI           |
-                                       | Auto-refresh 30s       |
-                                       | Dark theme, responsive |
-                                       +------------------------+
+3 Machines (push every 60s)            Vercel
+  Scout Pi (8GB)                       /api/stats
+  Claw Pi (4GB)        POST -------->  Validate Bearer key
+  Mac Mini (M4)        Bearer token    Store in Upstash Redis
+
+                                       GET /api/stats (public)
+                                       Dashboard reads current + 24h history
 ```
 
 ---
 
 ## Dashboard sections
 
-| Section | Data source | What it shows |
-|---------|-------------|---------------|
-| **Gateway Status** | Health monitor | UP/DOWN badge, uptime, health score (0-10), streak |
-| **Pi Vitals** | System stats | CPU temp, memory, disk usage, load average |
-| **Environment** | DHT11 sensor | Temperature + humidity |
-| **Health History** | 24h rolling data | Area chart of health score + CPU temp over time |
-| **Recent Alerts** | Telegram alerter | Timestamped list of down/recovery alerts |
+| Section | What it shows |
+|---------|---------------|
+| **Status Banner** | Color-coded system health — green (active), amber (partial outage), red (down) |
+| **System Vitals** | CPU temp, memory, disk, load avg with gradient progress bars. Gateway status + health score (Scout Pi only) |
+| **Environment** | DHT11 temperature + humidity, LED state, matrix pattern |
+| **CPU Temperature History** | 24h area chart with per-machine gradient fills |
+| **Recent Alerts** | Timestamped list of down/recovery alerts |
+
+All sections are collapsible dropdowns. First machine expanded by default.
 
 ---
 
@@ -54,33 +61,27 @@ Scout Pi                              Vercel
 
 ### 2. Add Upstash Redis
 
-Install [Upstash Redis](https://vercel.com/marketplace/upstash) from the Vercel Marketplace. It auto-sets `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+Install [Upstash Redis](https://vercel.com/marketplace/upstash) from the Vercel Marketplace. It auto-sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
 
 ### 3. Set the API key
-
-Generate a key and add it as a Vercel environment variable:
 
 ```bash
 openssl rand -hex 32
 # Add as SCOUT_API_KEY in Vercel project settings
 ```
 
-### 4. Configure the scout
+### 4. Deploy a stats agent
 
-Add the dashboard section to `config/scout.yaml` on the Pi:
-
-```yaml
-dashboard:
-  url: "https://your-project.vercel.app/api/stats"
-  api_key: "same-key-from-step-3"
-  push_interval: 60
-```
-
-Restart the scout:
+Copy `agent/stats_agent.py` to each machine and configure:
 
 ```bash
-sudo systemctl restart clawpi-scout
+export DASHBOARD_URL="https://your-project.vercel.app/api/stats"
+export DASHBOARD_API_KEY="same-key-from-step-3"
+export MACHINE_ID="clawpi"  # clawpiscout | clawpi | macmini
+python3 stats_agent.py
 ```
+
+Or use `agent/agent.yaml.example` as a config template. Service files are provided for systemd (Linux) and launchd (macOS).
 
 ---
 
@@ -89,7 +90,7 @@ sudo systemctl restart clawpi-scout
 ```bash
 npm install
 cp .env.example .env.local
-# Fill in Upstash Redis credentials and SCOUT_API_KEY
+# Fill in KV_REST_API_URL, KV_REST_API_TOKEN, SCOUT_API_KEY
 npm run dev
 ```
 
@@ -100,7 +101,7 @@ Test the API:
 curl -X POST http://localhost:3000/api/stats \
   -H "Authorization: Bearer your-key" \
   -H "Content-Type: application/json" \
-  -d '{"ts":1707700000,"gateway":{"status":"up","consecutive_ok":42,"uptime_seconds":86400},"system":{"cpu_temp":47.2,"disk_used_pct":34.5,"mem_total_mb":3792,"mem_available_mb":2100,"load_avg":"0.52"},"sensor":{"temperature":23.0,"humidity":45.0},"dashboard":{"health_score":8,"led_state":"green","matrix_pattern":"smiley"},"alerts":[]}'
+  -d '{"ts":1707700000,"machine":"clawpiscout","gateway":{"status":"up","consecutive_ok":42,"uptime_seconds":86400},"system":{"cpu_temp":47.2,"disk_used_pct":34.5,"mem_total_mb":3792,"mem_available_mb":2100,"load_avg":"0.52"},"sensor":{"temperature":23.0,"humidity":45.0},"dashboard":{"health_score":8,"led_state":"green","matrix_pattern":"smiley"},"alerts":[]}'
 
 # Read stats
 curl http://localhost:3000/api/stats
@@ -110,22 +111,26 @@ curl http://localhost:3000/api/stats
 
 ## Tech stack
 
-- **Next.js 15** — App Router, API routes
-- **Tailwind CSS** — Dark theme styling
-- **Upstash Redis** — Stats storage (free tier: 10K commands/day)
+- **Next.js 16** — App Router, API routes, TypeScript strict
+- **Tailwind CSS v4** — CSS-first config, glassmorphism dark theme
+- **Framer Motion** — Collapsible sections, entrance animations, staggered cards
+- **Recharts** — CPU temperature area chart with gradient fills
 - **SWR** — Client-side data fetching with 30s polling
-- **Recharts** — Health history area chart
-- **Vercel** — Hosting (free tier)
+- **Upstash Redis** — Stats storage (free tier)
+- **Vercel** — Hosting with auto-deploy on merge to main
 
 ---
 
 ## Related
 
 - **[clawpi-scout](https://github.com/BigDawg013/clawpi-scout)** — The watchdog daemon that feeds this dashboard
-- **[clawpi-ai](https://github.com/BigDawg013/clawpi-ai)** — OpenClaw on a Raspberry Pi (the gateway being monitored)
-- **[openclaw-setup](https://github.com/BigDawg013/openclaw-setup)** — Multi-agent AI system on Mac Mini
+- **[OpenClaw](https://openclaw.ai)** — The AI platform being monitored
 
 ---
+
+## Author
+
+Built by [RChursin](https://github.com/RChursin)
 
 ## License
 

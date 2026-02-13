@@ -14,15 +14,19 @@ Ask the user for:
 - **Machine ID**: Short lowercase identifier (e.g., `newpi`, `server1`)
 - **Label**: Display name (e.g., "New Pi", "Home Server")
 - **Description**: Brief role description (e.g., "4GB — media server")
-- **Chart color**: Hex color for the history chart line
+- **Chart color**: Hex color for the history chart line (e.g., `#f472b6`)
 
 ## Dashboard Code Changes
 
-1. **`lib/types.ts`**: Add the new machine to the `MachineId` union type and `MACHINE_META` record.
+1. **`lib/types.ts`**:
+   - Add the new ID to the `MachineId` union type
+   - Add entry to `MACHINE_META` with label and description
 
-2. **`app/components/history-chart.tsx`**: Add the machine's chart color to the `CHART_COLORS` map.
+2. **`app/components/history-chart.tsx`**:
+   - Add the machine's chart color to the `CHART_COLORS` map
 
-3. **`app/components/dashboard-shell.tsx`**: Add the machine ID to the `MACHINE_ORDER` array.
+3. **`app/components/dashboard-shell.tsx`**:
+   - Add the machine ID to the `MACHINE_ORDER` array
 
 ## Agent Setup on the New Machine
 
