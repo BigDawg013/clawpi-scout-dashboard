@@ -4,5 +4,5 @@
 
 url: "https://clawpi-scout-dashboard.vercel.app/api/stats"
 api_key: ""              # Same as SCOUT_API_KEY on Vercel
-machine_id: "clawpi"     # clawpi | macmini
+machine_id: "clawpi"     # clawpiscout | clawpi | macmini
 push_interval: 60        # seconds
